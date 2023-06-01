@@ -1,25 +1,30 @@
 clear
 
+% TODO
+% no decistion confirmation
+% less stimuli - ask izzy which stimuli
+
 % Initialize variables
 session = struct();
 
 % Get the participant ID via the console
 session.participant.id = string(input('Please enter the participant ID: ', 's'));
+
 % Create an empty table for the results with the following columns
 % participantID, stimulusID, pleasure, arousal, dominance, openness, hominess, safety, fascination, beauty
 session.results = table('Size', [0, 10], 'VariableTypes', {'string', 'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'}, 'VariableNames', {'participantID', 'stimulusID', 'pleasure', 'arousal', 'dominance', 'openness', 'hominess', 'safety', 'fascination', 'beauty'});
 
-
 % Set the screen configuration
 screenConfig  = Nu_setScreens();
 % Create LSL outlet
-% outlet = Nu_createLSLOutlet('NeurUrbanismMarkers');
-outlet = 1; % Placeholder
+outlet = Nu_createLSLOutlet('NeurUrbanismMarkers');
+
 % Create scales
 scales = Nu_createAllScales(screenConfig);
 % Create a stimulus
-stimuli = Nu_createAllStimuli(screenConfig);
+stimuli = Nu_createAllStimuli(screenConfig, "./ressources/stimuli/");
 halfIdxStimuli = floor(length(stimuli)/2);
+
 % Experimental procedure
 % 
 % 1. Present the stimulus for 500ms
@@ -27,11 +32,10 @@ halfIdxStimuli = floor(length(stimuli)/2);
 % 3. Get the response
 % 4. Repeat 1-3
 
-% Start the experiment
-% outlet.push_sample({'event: experimentStart'});
-
 % Welcome screen
 Nu_welcomeScreen(screenConfig);
+
+outlet.push_sample({'event: experimentStart'});
 
 % Present the stimuli
 for stimulusIdx = 1:halfIdxStimuli
@@ -51,12 +55,12 @@ for stimulusIdx = 1:halfIdxStimuli
     dominanceResponse = Nu_presentScale(scales.sam.dominance, stimulus, screenConfig, outlet);
 
     % Append the responses to the session.results table
-    trialResults = table(session.participant.id, stimulus.id, pleasureResponse, arousalResponse, dominanceResponse, opennessResponse, hominessResponse, safetyResponse, fascinationResponse, beautyResponse, 'VariableNames', {'participantID', 'stimulusID', 'pleasure', 'arousal', 'dominance', 'openness', 'hominess', 'safety', 'fascination', 'beauty'});
+    trialResults = table(session.participant.id, string(stimulus.id), pleasureResponse, arousalResponse, dominanceResponse, opennessResponse, hominessResponse, safetyResponse, fascinationResponse, beautyResponse, 'VariableNames', {'participantID', 'stimulusID', 'pleasure', 'arousal', 'dominance', 'openness', 'hominess', 'safety', 'fascination', 'beauty'});
     session.results = [session.results; trialResults];
 end
 
 % Break screen
-Nu_breakScreen(screenConfig, 10);
+Nu_breakScreen(screenConfig, 120, outlet); % 2 minutes
 
 % Present the stimuli second half
 for stimuliIdx = halfIdxStimuli+1:length(stimuli)
@@ -70,13 +74,12 @@ for stimuliIdx = halfIdxStimuli+1:length(stimuli)
     fascinationResponse = Nu_presentScale(scales.likert.fascination, stimulus, screenConfig, outlet);
     safetyResponse = Nu_presentScale(scales.likert.safety, stimulus, screenConfig, outlet);
     
-
     pleasureResponse = Nu_presentScale(scales.sam.pleasure, stimulus, screenConfig, outlet);
     arousalResponse = Nu_presentScale(scales.sam.arousal, stimulus, screenConfig, outlet);
     dominanceResponse = Nu_presentScale(scales.sam.dominance, stimulus, screenConfig, outlet);
 
     % Append the responses to the session.results table
-    trialResults = table(session.participant.id, stimulus.id, pleasureResponse, arousalResponse, dominanceResponse, opennessResponse, hominessResponse, safetyResponse, fascinationResponse, beautyResponse, 'VariableNames', {'participantID', 'stimulusID', 'pleasure', 'arousal', 'dominance', 'openness', 'hominess', 'safety', 'fascination', 'beauty'});
+    trialResults = table(session.participant.id, string(stimulus.id), pleasureResponse, arousalResponse, dominanceResponse, opennessResponse, hominessResponse, safetyResponse, fascinationResponse, beautyResponse, 'VariableNames', {'participantID', 'stimulusID', 'pleasure', 'arousal', 'dominance', 'openness', 'hominess', 'safety', 'fascination', 'beauty'});
     session.results = [session.results; trialResults];
 end
 
@@ -85,6 +88,8 @@ writetable(session.results, 'results.csv');
 
 % Experiment end message
 Nu_goodbyeScreen(screenConfig);
+
+outlet.push_sample({'event: experimentEnd'});
 
 % Close the screen 
 Screen('CloseAll');

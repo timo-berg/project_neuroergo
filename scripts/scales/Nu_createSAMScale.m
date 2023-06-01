@@ -1,4 +1,19 @@
 function scale = Nu_createSAMScale(type, screen)
+%   Input:
+%   - type: either 'pleasure', 'arousal', 'dominance' (character array)
+%   - screen: screen information as provided by Nu_setScreens (struct)
+%   Output:
+%   - scale: scale information with the following fields (struct)
+%       - option_circles: coordinates of the circles for each option (4 x numOptions matrix)
+%       - selection_circles: coordinates of the circles for each selection (4 x numOptions matrix)
+%       - numOptions: number of options (integer)
+%       - response: response information with the SAM image, the limit text and their position (struct)
+%       - prompt: prompt information with the text and its position (struct)
+%       - type: type of scale (character array)
+%
+%   Creates a SAM scale for the given type. The struct contains
+%   all the necessary information to display the scale.
+
     % Scale settings
     samScaleFactor = 0.6;
     gap = 95 * samScaleFactor;
@@ -60,5 +75,5 @@ function scale = Nu_createSAMScale(type, screen)
     scale.prompt.y = ycenter - 225*samScaleFactor;
     scale.prompt.color = screen.colors.black;
 
-    scale.type = "SAM";
+    scale.type = ['SAM-' type];
 end

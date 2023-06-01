@@ -1,4 +1,9 @@
 function Nu_welcomeScreen(screen)
+%   Inputs:
+%   - screen: structure containing screen information as produced by Nu_setScreens (struct)
+%
+%   Draws a welcome screen and waits for a key press to continue.
+
     % Set up the screen
     Screen('TextSize', screen.window, 24);
     Screen('TextFont', screen.window, 'Arial');

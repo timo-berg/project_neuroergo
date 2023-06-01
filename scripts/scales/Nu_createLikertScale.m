@@ -1,4 +1,20 @@
-function scale = Nu_createLikertScale(prompt, screen)
+function scale = Nu_createLikertScale(prompt, type, screen)
+%   Inputs:
+%   - prompt: string to display above scale (character array)
+%   - type: topic of the scale (character array)
+%   - screen: screen information (struct)
+%   Outputs:
+%   - scale: scale information with the following fields (struct) 
+%       - option_circles: coordinates of circles for each option (4 x numOptions matrix)
+%       - selection_circles: coordinates of circles for each selection (4 x numOptions matrix)
+%       - numOptions: number of options (integer)
+%       - response: text and coordinates of response options (struct)
+%       - prompt: text and coordinates of prompt (struct)
+%       - type: topic of the scale (character array)
+%
+%   Creates a Likert scale with the given prompt and topic. The struct contains
+%   all the necessary information to display the scale.
+
     % Scale settings
     gap = 75;
     radius_option = 10;
@@ -37,5 +53,5 @@ function scale = Nu_createLikertScale(prompt, screen)
     scale.prompt.y = ycenter - 50;
     scale.prompt.color = screen.colors.black;
 
-    scale.type = "Likert";
+    scale.type = ['Likert-' type];
 end

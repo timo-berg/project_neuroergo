@@ -1,16 +1,26 @@
 function response = Nu_drawLikertScale(scale, screen, stimulus, outlet)
-    
+%   Inputs:
+%   - scale: structure containing scale information as produced by Nu_createLikertScale (struct)
+%   - screen: structure containing screen information as produced by Nu_setScreens (struct)
+%   - stimulus: structure containing stimulus information as produced by Nu_createStimulus (struct)
+%   - outlet: LSL outlet for sending event markers (lsl_outlet)
+%   Outputs:
+%   - response: response selected by participant (int)
+%
+%   Draws the scale and stimulus to the screen and waits for a response. Returns the response selected by the participant.
+
+    % Draw scale and stimulus
     Screen('TextSize', screen.window, 18);
     drawScale(scale, screen, stimulus);
     Screen('Flip', screen.window);
-    % outlet.push_sample({"event: likertPresented; scale: " + scale.prompt.text + "; stimulus: " + stimulus.id + ";"});
+    outlet.push_sample({['event: scalePresented; scale: ' scale.type '; stimulus: ' stimulus.id]});
     
 
     % Initialize response
     response = -1;
 
     % Get mouse click
-    while true
+    while response == -1
         [x, y, buttons] = GetMouse(screen.window);
         if any(buttons)
             for i = 1:scale.numOptions
@@ -20,21 +30,24 @@ function response = Nu_drawLikertScale(scale, screen, stimulus, outlet)
                     drawScale(scale, screen, stimulus);
                     Screen('FillOval', screen.window, screen.colors.black, scale.selection_circles.coords(:,i), scale.selection_circles.radius);
                     Screen('Flip', screen.window);
-                    % outlet.push_sample({"event: likertOptionSelected; scale: " + scale.prompt.text + "; stimulus: " + stimulus.id + ";" + "response: " + scale.response.text{i} + ";"});
                     break;
                 end
             end
         end         
-        % Check for keyboard stroke to confirm response
-        [keyIsDown, ~, ~] = KbCheck;
-        if keyIsDown && response ~= -1
-            % outlet.push_sample({"event: likertOptionConfirmed; scale: " + scale.prompt.text + "; stimulus: " + stimulus.id + ";" + "response: " + scale.response.text{i} + ";"});
-            break;
-        end
     end
+
+    % Send event marker
+    outlet.push_sample({['event: optionConfirmed; scale: ' scale.type  '; stimulus: ' stimulus.id '; response: ' num2str(response)]});
 end
 
 function drawScale(scale, screen, stimulus)
+%   Inputs:
+%   - scale: structure containing scale information as produced by Nu_createLikertScale (struct)
+%   - screen: structure containing screen information as produced by Nu_setScreens (struct)
+%   - stimulus: structure containing stimulus information as produced by Nu_createStimulus (struct)
+%
+%   Draws the scale and stimulus to the screen.
+
     % Draw prompt
     DrawFormattedText(screen.window, scale.prompt.text, scale.prompt.x, scale.prompt.y, scale.prompt.color);
     % Draw response text
