@@ -1,8 +1,6 @@
-clear
+addpath(genpath(".\scripts\"));
 
-% TODO
-% no decistion confirmation
-% less stimuli - ask izzy which stimuli
+clear
 
 % Initialize variables
 session = struct();
@@ -22,7 +20,7 @@ outlet = Nu_createLSLOutlet('NeurUrbanismMarkers');
 % Create scales
 scales = Nu_createAllScales(screenConfig);
 % Create a stimulus
-stimuli = Nu_createAllStimuli(screenConfig, "./ressources/stimuli/");
+stimuli = Nu_createAllStimuli(screenConfig, ".\ressources\stimuli\");
 halfIdxStimuli = floor(length(stimuli)/2);
 
 % Experimental procedure
@@ -36,6 +34,9 @@ halfIdxStimuli = floor(length(stimuli)/2);
 Nu_welcomeScreen(screenConfig);
 
 outlet.push_sample({'event: experimentStart'});
+
+% First Baseline
+Nu_baselineScreen(screenConfig, 3*60, outlet); % 3 minutes
 
 % Present the stimuli
 for stimulusIdx = 1:halfIdxStimuli
@@ -84,7 +85,9 @@ for stimuliIdx = halfIdxStimuli+1:length(stimuli)
 end
 
 % Write the results to a csv file
-writetable(session.results, 'results.csv');
+writetable(session.results, ['.\results\results_' convertStringsToChars(session.participant.id) '.csv']);
+
+Nu_baselineScreen(screenConfig, 3*60, outlet); % 3 minutes
 
 % Experiment end message
 Nu_goodbyeScreen(screenConfig);

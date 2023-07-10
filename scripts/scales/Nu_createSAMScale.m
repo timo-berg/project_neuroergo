@@ -27,16 +27,15 @@ function scale = Nu_createSAMScale(type, screen)
     
 
     % Define type
+    prompt = 'How does this space make you feel?';
+    
     if strcmp(type, 'pleasure')
-        prompt = 'How would you feel in this environment?';
         limit_text = {'happy', 'unhappy'};
         samImagePath = ressourceFolder + "SAMpleasure.jpg";
     elseif strcmp(type, 'arousal')
-        prompt = 'How would you feel in this environment?';
         limit_text = {'excited', 'calm'};
         samImagePath = ressourceFolder + "SAMarousal.jpg";
     elseif strcmp(type, 'dominance')
-        prompt = 'How would you feel in this environment?';
         limit_text = {'controlled', 'in control'};
         samImagePath = ressourceFolder + "SAMdominance.jpg";
     end
